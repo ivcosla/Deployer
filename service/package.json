@@ -1,0 +1,8 @@
+{
+	"service":{
+		"components":"Array de componentes",
+		"connections":"Array conexiones (con quien conecta [2,3,1])",
+		"configs":"Array configuraciones cada servicio",
+		"configs_effects":"Ni idea"
+	}
+}
