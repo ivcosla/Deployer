@@ -1,0 +1,9 @@
+{
+	"component":{
+		"connections":{
+			"input-connection":"inSocket",
+			"output-connection":"outSocket"
+		},
+		"configuration":"name"
+	}
+}
