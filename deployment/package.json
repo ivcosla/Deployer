@@ -1,0 +1,12 @@
+{
+	"url":"http://dominio.com",
+	"cardinality":{
+		"comp1":1,
+		"comp2":1,
+		"comp3":1
+	},
+	"params":{
+		"param1":"",
+		"param2":""
+	}
+}

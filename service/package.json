@@ -1,8 +1,32 @@
 {
-	"service":{
-		"components":"Array de componentes",
-		"connections":"Array conexiones (con quien conecta [2,3,1])",
-		"configs":"Array configuraciones cada servicio",
-		"configs_effects":"Ni idea"
-	}
+
+	"ID":"comp://deployer/service",
+	"components":{
+		"comp1":"comp://deployer/component",
+		"comp2":"comp://deployer/component2",
+		"comp3":"comp://deployer/component3"
+	},
+	"graph":[
+		{
+			"chan1":{
+				"tipo":"lb",
+				"source":{
+					"comp":"comp1",
+					"endpoint":"i1"
+				},
+				"destination":{
+					"comp":"comp2",
+					"endpoint":"i1"
+				}
+			}
+		}
+	]
+	,
+	"entrypoint":{
+		"comp":"comp1",
+		"endpoint":"i1"
+	},
+	"params":{
+		"param1":""
+	}	
 }
