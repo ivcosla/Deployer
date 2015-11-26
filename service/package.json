@@ -2,9 +2,8 @@
 
 	"ID":"comp://deployer/service",
 	"components":{
-		"comp1":"comp://deployer/component",
-		"comp2":"comp://deployer/component2",
-		"comp3":"comp://deployer/component3"
+		"comp1":"../../component/code/component.js",
+		"comp2":"../../component2/code/component2.js"
 	},
 	"graph":[
 		{
