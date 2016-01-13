@@ -7,18 +7,30 @@ var component = JSON.parse(pack_json);
 //var serviceEndPoint = process.argv[1]
 
 console.log("Mi stdout");
-/*var sub = zmq.socket('sub');
-sub.connect('tcp://localhost:8000');
+var sub = zmq.socket('sub');
+
+sub.connect('tcp://localhost:8001');
 sub.subscribe("comp1");
 
 sub.on("message", function (msg) {
 	console.log(msg);
-})*/
+})
 
 var pull = zmq.socket('pull');
-pull.bind('tcp://*:8000',function(err){
-	if(err) throw err;
+var push = zmq.socket('push');
+pull.bind('tcp://0.0.0.0:8000',function(err){
+	if(err) console.log(err);
+    console.log('conectado')
+    pull.on("message", function(msg){
+        console.log(msg.toString());
+    })
 });
-pull.on("message", function(msg){
-	console.log(msg.toString());
+
+
+push.bind('tcp://0.0.0.0:8001', function(err){
+    console.log(err);
+     setInterval(function(){
+    push.send("Soy el componente")
+    //console.log("envio")
+    }, 1000)
 })

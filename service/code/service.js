@@ -1,15 +1,32 @@
+//2 canales, uno de entrada y otro de salida
+//para comunicar con un contenedor
+// Lanzar contenedor de la siguiente manera:
+//docker run -p 8000:8000 -p 8001:8001 -a STDOUT component/component
 var exec=require('child_process').exec
 var zmq=require('zmq');
 var fs = require('fs');
 var pck_json=fs.readFileSync('../package.json','utf8')
 
 var service = JSON.parse(pck_json);
-var pub = zmq.socket('pub');
-//IP por defecto MV: 192.168.99.100
-//pub.bindSync("tcp://*:8000");
-//pub.bindSync("tcp://192.168.99.100:8000",function(err){
-//	if(err) throw(err);
-//})
+var pull = zmq.socket('pull');
+var push = zmq.socket('push');
+
+pull.connect("tcp://localhost:8001",function(err){
+    if(err) console.log("bind fail")
+});
+pull.on("message", function(msg){
+    console.log(msg.toString())
+})
+
+
+push.connect("tcp://localhost:8000",function(err){
+    if(err) console.log(err);
+    console.log("connected")
+})
+setInterval(function(){
+    push.send("hola")
+}, 1000);
+
 
 //Lanzar a ejecución cada componente.
 //Cambiar a ejecución en docker.
@@ -22,6 +39,8 @@ var pub = zmq.socket('pub');
 
 //Envía información a cada componente por cada
 //canal del grafo, para que puedan configurarse
+
+/*pub.bindSync('tcp://*:8001',function(err){
 /*for (var a in service.graph[0]){
 	var canal=service.graph[0][a];
 	var tipo_canal = canal.tipo;
@@ -37,18 +56,6 @@ var pub = zmq.socket('pub');
 			
 			pub.send([canal.destination.comp,
 				canal.destination.endpoint+
-				'destination']);
-				
-			console.log("Sockets enviados")
-		},10000);*/
-		
-	var push = zmq.socket('push');
-	//push.connect('tcp://*:8000',function(err){
-	push.connect(process.env.C1_PORT ,function(err){	
-		if(err) throw err;
-		console.log("connected")
-	})
-		setInterval(function(){
-			push.send("hola")
-			}, 1000);
-//}
+				'destination']);			
+			console.log("Sockets enviados")	},10000);
+            }*/
