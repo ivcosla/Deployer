@@ -1,5 +1,5 @@
 {
-	"ID":"comp://deployer/component",	
+	"ID":"../component.tgz",	
 	"connections":{
 		"input-connection":[
 			{"i1":"pull"},
@@ -13,6 +13,9 @@
 	"params":{
 		"param1":"1",
 		"param2":"null"
-	}
-	
+	},
+    "dependencies":{
+        "d1":"system:zip",
+        "d2":"node:tar"
+    }
 }

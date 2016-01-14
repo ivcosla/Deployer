@@ -2,8 +2,8 @@
 
 	"ID":"comp://deployer/service",
 	"components":{
-		"comp1":"../../component/code/component.js",
-		"comp2":"../../component2/code/component2.js"
+		"comp1":"../../component/",
+		"comp2":"../../component2/"
 	},
 	"graph":[
 		{
