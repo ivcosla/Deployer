@@ -13,9 +13,5 @@
 	"params":{
 		"param1":"1",
 		"param2":"null"
-	},
-    "dependencies":{
-        "d1":"system:zip",
-        "d2":"node:tar"
-    }
+	}
 }
