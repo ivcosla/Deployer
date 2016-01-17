@@ -60,16 +60,13 @@ for (var comp in components){
 
 // Deploy each container when its image is builded
 myEmitter.on('buildFinish', function(comp){
-    var i=0;    
-    for (var compCard in dJson.cardinality){
-        console.log('Running container: '+comp+'-'+i+' ...\n')
+    for (var i=0; i<dJson.cardinality[comp]; i++){
         // TODO: Try to delete stdout. Now stdout is merging the stdout
         // of each container. 
         docker.run('component/'+comp,[],process.stdout,function(err){
                 if(err) console.log(err)
-                console.log('Container: '+comp+'-'+i+' ... is Running \n')
+                else console.log('Container: '+comp+'-'+i+' ... is Running \n')
         })
-        i=i+1;
     }
 })
     
