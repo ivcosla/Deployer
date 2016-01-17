@@ -1,8 +1,21 @@
 var dJson = require("../package.json");
 var sJson = require("../"+dJson.service_path+"package.json");
+var exec = require('child_process').execSync; 
+var EvEm = require('events').EventEmitter;
+const util = require('util');
+
+// MyEmitter inherits from events class
+function MyEmitter() {
+  EvEm.call(this);
+}
+util.inherits(MyEmitter, EvEm);
+
+// Own event emitter instance
+const myEmitter = new MyEmitter();
+
+// Additional dependency
 var Docker = require("dockerode");
 var docker = new Docker();
-var exec = require('child_process').execSync; 
 
 // For tailoring the dockerfiles of each component
 var Dfm = require("./dockerFileMaker.js");
@@ -18,8 +31,10 @@ for (var comp in components){
     // as tar. Dockerfile must be in root of the tar.
     
     // Using system call instead of nodejs library.
+    // console.log('Dockerfile created. Compressing component...'
+    //    +comp+'...')
     exec('tar -C '+components[comp]+' -cvf ../'+comp+'.tar'+' .')
-
+    // console.log(comp+'.tar created at deployment/')
     console.log('Building image for: '+comp+'...');
     
     // Wrapper so the value comp is the original from each invocation of
@@ -33,9 +48,28 @@ for (var comp in components){
                 
                 function onFinished(err, output){
                     if (err) console.log(err)
-                    console.log('component/'+originalValueComp+' image created')                
+                    console.log('component/'+originalValueComp+' image created')
+                    
+                    // Once the image is created we can proceed to run every copy
+                    // of the container from the image.
+                    myEmitter.emit('buildFinish',originalValueComp)                
                 }
             })
     })(comp);
+}    
 
-}
+// Deploy each container when its image is builded
+myEmitter.on('buildFinish', function(comp){
+    var i=0;    
+    for (var compCard in dJson.cardinality){
+        console.log('Running container: '+comp+'-'+i+' ...\n')
+        // TODO: Try to delete stdout. Now stdout is merging the stdout
+        // of each container. 
+        docker.run('component/'+comp,[],process.stdout,function(err){
+                if(err) console.log(err)
+                console.log('Container: '+comp+'-'+i+' ... is Running \n')
+        })
+        i=i+1;
+    }
+})
+    

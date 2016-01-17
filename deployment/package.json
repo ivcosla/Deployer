@@ -3,8 +3,7 @@
     "service_path":"../service/",
 	"cardinality":{
 		"comp1":1,
-		"comp2":1,
-		"comp3":1
+		"comp2":2
 	},
 	"params":{
 		"param1":"",
