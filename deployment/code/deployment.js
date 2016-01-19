@@ -1,5 +1,4 @@
 var dJson = require("../package.json");
-var sJson = require("../"+dJson.service_path+"package.json");
 var exec = require('child_process').execSync; 
 var EvEm = require('events').EventEmitter;
 const util = require('util');
@@ -21,6 +20,12 @@ var docker = new Docker();
 var Dfm = require("./dockerFileMaker.js");
 var dfm = new Dfm();
 
+// For solving uri, retrieving .tgz and updating cache
+var uriSolver = require("./uriSolver.js")
+
+var paths = uriSolver.solve(dJson);
+console.log(paths)
+var sJson = require(paths['service']+'/package.json');
 // Create network for the containers. Feature introduced in Docker 1.9.1.
 exec('docker network create deployernet');
 
@@ -28,16 +33,13 @@ exec('docker network create deployernet');
 // at the top of its directory
 var components = sJson.components;
 for (var comp in components){
-    dfm.composeDockerfile(components[comp],sJson)  
+    dfm.composeDockerfile(paths[comp]+'/',sJson)  
     // In order to build images from the Api, the directory
     // containing the Dockerfile and code must be compressed
     // as tar. Dockerfile must be in root of the tar.
     
     // Using system call instead of nodejs library.
-    // console.log('Dockerfile created. Compressing component...'
-    //    +comp+'...')
-    exec('tar -C '+components[comp]+' -cvf ../'+comp+'.tar'+' .')
-    // console.log(comp+'.tar created at deployment/')
+    exec('tar -C '+paths[comp]+'/ -cvf ../'+comp+'.tar'+' .')
     console.log('Building image for: '+comp+'...');
     
     // Wrapper so the value comp is the original from each invocation of

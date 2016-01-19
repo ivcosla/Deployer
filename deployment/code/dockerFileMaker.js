@@ -14,16 +14,7 @@ module.exports=function(){
     this.getJson = function(filename){
         return require(filename);
         }
-
-    // firstable, we get the uri that identifies the location from
-    // where the code of the component has to be retrieved, and is packed
-    // within a tgz file.
-    // in this version only local directories are allowed.
-    this.extractTgz = function (control,file,dest){
-            new TGZ().extract(file,dest,function(){
-            control=1;
-        })
-    }
+        
     // This function gets the dependencies required to be installed
     // on the setup of the image (they have to be on the Dockerfile)
     // and returns them on a string variable
@@ -66,8 +57,6 @@ module.exports=function(){
     this.composeDockerfile = function (pathToComponent, serv){
         var comp = this.getJson(pathToComponent+'package.json');
         //var serv = this.getJson(pathToService+'package.json');
-        var done;
-        this.extractTgz(done, comp.ID, pathToComponent)
         var res = 'FROM component/base\nRUN mkdir component\n'+
                 'COPY . /component/ \n'+'WORKDIR "/component/code"\n'
                 

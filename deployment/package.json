@@ -1,6 +1,7 @@
 {
-	"url":"http://dominio.com",
+	"url":"http://deployer",
     "service_path":"../service/",
+    "service":"http://deployer/service",
 	"cardinality":{
 		"comp1":1,
 		"comp2":2

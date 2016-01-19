@@ -1,0 +1,4 @@
+{
+    "http://deployer/service/comp":"../component.tgz",
+    "http://deployer/service/comp2":"../component2.tgz"
+}

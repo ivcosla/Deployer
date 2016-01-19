@@ -1,9 +1,9 @@
 {
 
-	"ID":"comp://deployer/service",
+	"uri":"http://deployer/service",
 	"components":{
-		"comp1":"../../component/",
-		"comp2":"../../component2/"
+		"comp1":"http://deployer/service/comp",
+		"comp2":"http://deployer/service/comp2"
 	},
 	"graph":[
 		{
