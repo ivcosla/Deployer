@@ -27,10 +27,12 @@ pull.bind('tcp://0.0.0.0:8000',function(err){
 });
 
 
-push.bind('tcp://0.0.0.0:8001', function(err){
+push.connect('tcp://comp2-0:8000', function(err){
     console.log(err);
-     setInterval(function(){
+})
+
+setInterval(function(){
     push.send("Soy el componente")
     //console.log("envio")
-    }, 1000)
-})
+}, 5000)
+

@@ -21,6 +21,9 @@ var docker = new Docker();
 var Dfm = require("./dockerFileMaker.js");
 var dfm = new Dfm();
 
+// Create network for the containers. Feature introduced in Docker 1.9.1.
+exec('docker network create deployernet');
+
 // loops througth each component and makes a Dockerfile
 // at the top of its directory
 var components = sJson.components;
@@ -63,7 +66,18 @@ myEmitter.on('buildFinish', function(comp){
     for (var i=0; i<dJson.cardinality[comp]; i++){
         // TODO: Try to delete stdout. Now stdout is merging the stdout
         // of each container. 
-        docker.run('component/'+comp,[],process.stdout,function(err){
+        
+        docker.run('component/'+comp,[],process.stdout,{
+            'Hostname':comp+'-'+i,
+            'name':comp+'-'+i,
+            'ExposedPorts': { 
+                '8000/tcp': {} 
+                },
+             'HostConfig':{
+                 'NetworkMode':'deployernet'
+             }
+            },
+        function(err){
                 if(err) console.log(err)
                 else console.log('Container: '+comp+'-'+i+' ... is Running \n')
         })
