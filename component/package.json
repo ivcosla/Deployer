@@ -1,13 +1,13 @@
 {
 	"ID":"../component.tgz",	
 	"connections":{
-		"input-connection":[
-			{"i1":"pull"},
-			{"i2":"sub"}
-        ],
-		"output-connection":[
-			{"o1":"push"}
-        ]
+		"input-connection":{
+			"i1":"pull",
+			"i2":"sub"
+        },
+		"output-connection":{
+			"o1":"push"
+        }
 	},
 	"entrypoint":"code/component.js",
 	"params":{

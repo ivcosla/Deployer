@@ -12,16 +12,16 @@ util.inherits(MyEmitter, EvEm);
 // Own event emitter instance
 const myEmitter = new MyEmitter();
 
-// Additional dependency
+// Additional dependencies
 var Docker = require("dockerode");
 var docker = new Docker();
 
 // For tailoring the dockerfiles of each component
-var Dfm = require("./dockerFileMaker.js");
+var Dfm = require("utilites/dockerFileMaker.js");
 var dfm = new Dfm();
 
 // For solving uri, retrieving .tgz and updating cache
-var uriSolver = require("./uriSolver.js")
+var uriSolver = require("utilities/uriSolver.js")
 
 var paths = uriSolver.solve(dJson);
 console.log(paths)
