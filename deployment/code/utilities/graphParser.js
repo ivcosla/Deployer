@@ -19,12 +19,19 @@ function setCompPorts(sJson,paths){
         }
                        
     }
+    
+    return resList;
 }
 
-function parse(sJson){
+function parse(sJson,paths){
     var graph = sJson.graph;
+    var inSocketList = setCompPorts(sJson,paths);
+    var outSocketList = {};
     
     for (var channel in graph){
-        //channel.source.        
+        //channel.source.   
+        if(channel.type=="point-to-point"){
+            
+        }     
     }
 }
