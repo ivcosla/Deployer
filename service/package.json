@@ -5,21 +5,33 @@
 		"comp1":"http://deployer/service/comp",
 		"comp2":"http://deployer/service/comp2"
 	},
-	"graph":[
-		{
-			"chan1":{
-				"tipo":"lb",
-				"source":{
-					"comp":"comp1",
-					"endpoint":"i1"
-				},
-				"destination":{
-					"comp":"comp2",
-					"endpoint":"i1"
-				}
-			}
-		}
-	]
+	"graph":{		
+        "chan1":
+        {
+            "type":"lb",
+            "source":{
+                "comp":"comp1",
+                "endpoint":"o1"
+            },
+            "destination":{
+                "comp":"comp2",
+                "endpoint":"i1"
+            }
+        },
+        "chan2":
+        {
+            "type":"point-to-point",
+            "source":{
+                "comp":"comp2",
+                "endpoint":"o1"
+            },
+            "destination":{
+                "comp":"comp1",
+                "endpoint":"i1"
+            }
+        }
+		
+    }
 	,
 	"entrypoint":{
 		"comp":"comp1",
