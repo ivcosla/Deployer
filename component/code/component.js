@@ -6,34 +6,37 @@ var component = JSON.parse(pack_json);
 //fs.writeFile("hola.txt",'hola')
 //var serviceEndPoint = process.argv[1]
 
-console.log("Mi stdout");
-var sub = zmq.socket('sub');
+setTimeout(function(){
 
-sub.connect('tcp://localhost:8001');
-sub.subscribe("comp1");
+    console.log("Mi stdout");
+    var sub = zmq.socket('sub');
 
-sub.on("message", function (msg) {
-	console.log(msg);
-})
+    sub.connect('tcp://localhost:8001');
+    sub.subscribe("comp1");
 
-var pull = zmq.socket('pull');
-var push = zmq.socket('push');
-pull.bind('tcp://0.0.0.0:8000',function(err){
-	if(err) console.log(err);
-    console.log('conectado')
-    pull.on("message", function(msg){
-        console.log(msg.toString());
+    sub.on("message", function (msg) {
+        console.log(msg);
     })
-});
+
+    var pull = zmq.socket('pull');
+    var push = zmq.socket('push');
+    pull.bind('tcp://*:8000',function(err){
+        if(err) console.log(err);
+        console.log('conectado')
+        pull.on("message", function(msg){
+            console.log(msg.toString());
+        })
+    });
 
 
 
-push.connect('tcp://comp2-0:8000', function(err){
-    console.log(err);
-})
+    push.connect('tcp://comp2-0:8000', function(err){
+        console.log(err);
+    })
 
-setInterval(function(){
-    push.send("Soy el componente")
-    //console.log("envio")
-}, 5000)
+    setInterval(function(){
+        push.send("Soy el componente")
+        //console.log("envio")
+    }, 5000)
 
+},30000);
