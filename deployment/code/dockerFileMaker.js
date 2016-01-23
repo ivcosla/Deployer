@@ -61,9 +61,8 @@ module.exports=function(){
                 'COPY . /component/ \n'+'WORKDIR "/component/code"\n'
                 
         res=res+this.writeDependencies(serv);
-        var entrypointFullPathSplited = comp.entrypoint.split('/')
-        var executable = entrypointFullPathSplited[entrypointFullPathSplited.length-1]
-        res=res+ 'CMD ["nodejs","'+executable+'"]'
+
+        res=res+ 'CMD ["nodejs","component.js"]'
         fs.writeFileSync(pathToComponent+'Dockerfile',res);
     }
 }

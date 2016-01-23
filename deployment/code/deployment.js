@@ -65,7 +65,8 @@ for (var comp in components){
 
 // Deploy each container when its image is builded
 myEmitter.on('buildFinish', function(comp){
-    for (var i=0; i<dJson.cardinality[comp]; i++){
+    for (var i=0; i<dJson.cardinality[comp]; i++)
+    {
         // TODO: Try to delete stdout. Now stdout is merging the stdout
         // of each container. 
         

@@ -29,7 +29,7 @@ var retrieve = function(uri, uriD){
         for (var folder in dirHierarchy){
             pathD = pathD + dirHierarchy[folder] + '/'
             if (!fs.existsSync('../cache/'+pathD))
-                fs.mkdir('../cache/'+pathD)
+                fs.mkdirSync('../cache/'+pathD)
         }
         // The directory is complete. We retrieve the .tgz
         // Get the name.tgz from the uri dictionary value
