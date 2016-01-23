@@ -27,6 +27,7 @@ pull.bind('tcp://0.0.0.0:8000',function(err){
 });
 
 
+
 push.connect('tcp://comp2-0:8000', function(err){
     console.log(err);
 })
