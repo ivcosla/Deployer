@@ -6,7 +6,7 @@
 var cJson = require('../package.json')
 var zmq = require('zmq')
 // Gets the names of the components that this component
-// haves an output connection with througth arguments
+// has an output connection with througth arguments
 var args = process.argv.slice(2)
 console.log(args)
 
