@@ -36,7 +36,7 @@ var retrieve = function(uri, uriD){
         var uriValuSplited = uriD[uri].split('/');
         var tgzName = uriValuSplited[uriValuSplited.length-1];
         
-        var source = fs.readFileSync('../'+uriD[uri]);
+        var source = fs.readFileSync(uriD[uri]);
         fs.writeFileSync('../cache/'+pathD + tgzName, source);
         
         // Add the uri to the cache
@@ -46,7 +46,7 @@ var retrieve = function(uri, uriD){
         // Write the cache json
         fs.writeFileSync('../cache/cache.json',JSON.stringify(cache))
         
-        console.log(pathD)
+        console.log(completePath)
         // Return the path
         return completePath
     }
@@ -77,7 +77,11 @@ var solve = function(dJson){
         // Retrieve each component path to its tgz in the cache
         // and extract.
         var cpath = retrieve(curi,sUriD);
-        tgz.extract('../cache/'+cpath,'../../'+comp)
+        if(!fs.existsSync('../../'+comp))
+            fs.mkdirSync('../../'+comp);
+        exec('tar -C ../../'+comp+' -zxvf ../cache/'+cpath)
+        
+        //tgz.extract('../cache/'+cpath,'../../'+comp)
         res[comp] = '../../'+comp 
             
     }
