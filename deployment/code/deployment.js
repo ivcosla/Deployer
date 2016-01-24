@@ -29,11 +29,18 @@ var graphParser = require("./graphParser.js");
 // For convert the graphParser dictionaries into arguments for containers
 var argumentsParser = require("./argumentsParser.js");
 
+// Deployer receives an "ID" from arguments that will be attached to the network and 
+// component names in order to avoid name collision when multiple instances of
+// the same service are deployed. For example, if id = 2 then possible names for
+// network and components will be: deployernet-2, channel1-2, comp1-0-2.
+var args = process.argv.slice(2);
+var id = args[0];
+
 var paths = uriSolver.solve(dJson);
 console.log(paths)
 var sJson = require(paths['service']+'/package.json');
 // Create network for the containers. Feature introduced in Docker 1.9.1.
-exec('docker network create deployernet');
+exec('docker network create deployernet'+'-'+id);
 
 // loops througth each component and makes a Dockerfile
 // at the top of its directory
@@ -71,10 +78,12 @@ for (var comp in components){
 // TODO: pass arguments on docker.run. Create image for lb channel. Unequivoque names for
 // every service network and container.
    
-var sockts = graphParser.parse(dJson,sJson,paths)
+var sockts = graphParser.parse(dJson,sJson,paths,id)
 var inSockts = sockts[0]; var outSockts = sockts[1];
 
 // First we deploy possible channels (check if there is at least one lb channel)
+// Note: the id is added to channels at graphParser.parse, variable "channel" is
+// channel name with.
 if (Object.keys(inSockts['lb']).length>0)
 {
     //var chIndex=0;
@@ -91,7 +100,7 @@ if (Object.keys(inSockts['lb']).length>0)
                 '5000/tcp': {} 
                 },
              'HostConfig':{
-                 'NetworkMode':'deployernet'
+                 'NetworkMode':'deployernet'+'-'+id
              }
             },function(err){
                 if(err) console.log(err);
@@ -110,14 +119,14 @@ myEmitter.on('buildFinish', function(comp){
         // of each container. 
         
         docker.run('component/'+comp,[],process.stdout,{
-            'Hostname':comp+'-'+i,
-            'name':comp+'-'+i,
+            'Hostname':comp+'-'+i+'-'+id,
+            'name':comp+'-'+i+'-'+id,
             'Cmd':['node','runtime.js',cArgs],
             'ExposedPorts': { 
                 '5000/tcp': {} 
                 },
              'HostConfig':{
-                 'NetworkMode':'deployernet'
+                 'NetworkMode':'deployernet'+'-'+id
              }
             },
         function(err){

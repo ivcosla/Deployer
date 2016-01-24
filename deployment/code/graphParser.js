@@ -27,7 +27,7 @@ function setCompPorts(sJson,paths){
     return [resList,outSocketList];
 }
 
-function parse(dJson,sJson,paths){
+function parse(dJson,sJson,paths,id){
     var graph = sJson.graph;
     var socketLists = setCompPorts(sJson,paths);
     var inSocketList = socketLists[0];
@@ -53,21 +53,21 @@ function parse(dJson,sJson,paths){
         // Each entry: { dest_host: { source_ep:port }}
         if(graph[channel].type=="point-to-point"){
 
-            outSocketList[csc][cdc+'-0']={};
-            outSocketList[csc][cdc+'-0'][cse] = inSocketList[cdc][cde];  
+            outSocketList[csc][cdc+'-0-'+id]={};
+            outSocketList[csc][cdc+'-0-'+id][cse] = inSocketList[cdc][cde];  
         }     
     
         if(graph[channel].type=="lb"){
             // then deployment.js has to read the lb entry and deploy a container for each
             // channel.
-            inSocketList['lb'][channel] = inSocketList[cdc][cde];
-            outSocketList['lb'][channel] = {};
-            outSocketList[csc][channel]={};
-            outSocketList[csc][channel][cse] = inSocketList[cdc][cde];
+            inSocketList['lb'][channel+'-'+id] = inSocketList[cdc][cde];
+            outSocketList['lb'][channel+'-'+id] = {};
+            outSocketList[csc][channel+'-'+id]={};
+            outSocketList[csc][channel+'-'+id][cse] = inSocketList[cdc][cde];
             
             var lbTargetCardinality = dJson.cardinality[cdc];
             for (var i = 0; i < lbTargetCardinality; i++ ){
-                outSocketList['lb'][channel][cdc+'-'+i] = inSocketList[cdc][cde];       
+                outSocketList['lb'][channel+'-'+id][cdc+'-'+i+'-'+id] = inSocketList[cdc][cde];       
             }            
         }
     }
