@@ -45,6 +45,7 @@ setTimeout(function(){
             isock.bind("tcp://*:"+args[1],function(){
                 isock.on("message",function(msg){
                     endpoints[rrIndex].send(msg);
+                    console.log('msg redirected to socket',rrIndex);        
                     rrIndex++;
                     if(rrIndex == endpoints.length) rrIndex=0;
                 })

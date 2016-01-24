@@ -1,11 +1,11 @@
 
 // inSockets and outSockets are the input and output socket
 // of a given channel or component
-function convertToChannelArguments(inSocket, outSockets)
+function convertToChannelArguments(inSocket, outSockets, sType)
 {
     // Assuming rand lb channel
     var res='';
-    res += 'rand ';
+    res += sType+' ';
     // Now only one input socket, but for statement anyways.
     res += inSocket + ' ';
     

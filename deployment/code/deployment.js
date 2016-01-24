@@ -35,6 +35,8 @@ var argumentsParser = require("./argumentsParser.js");
 // network and components will be: deployernet-2, channel1-2, comp1-0-2.
 var args = process.argv.slice(2);
 var id = args[0];
+// Port to map entrypoint. Must to be different for every service launched.
+var portToMap = args[1];
 
 var paths = uriSolver.solve(dJson);
 console.log(paths)
@@ -89,8 +91,9 @@ if (Object.keys(inSockts['lb']).length>0)
     //var chIndex=0;
     for (var channel in inSockts['lb'])
     {
+        var originalChannel = channel.split('-')[0];
         var chArgs = argumentsParser.convertToChannelArguments(inSockts['lb'][channel],
-        outSockts['lb'][channel]);
+        outSockts['lb'][channel],sJson.graph[originalChannel]['sub-type']);
         
         docker.run('channel/lb',[],process.stdout,{
             'Hostname':channel,
@@ -113,59 +116,34 @@ if (Object.keys(inSockts['lb']).length>0)
 myEmitter.on('buildFinish', function(comp){
     var cArgs = argumentsParser.convertToComponentArguments(inSockts[comp],
         outSockts[comp]);
-    if(comp==sJson.entrypoint.comp)
-    {   
-        var portBinding = inSockts[sJson.entrypoint.comp][sJson.entrypoint.endpoint];
-        portBinding=portBinding.toString();
-        var portBWType = portBinding + '/tcp'; 
+        if(comp==sJson.entrypoint.comp){
+            var portBinding = inSockts[sJson.entrypoint.comp][sJson.entrypoint.endpoint];
+            portBinding=portBinding.toString();
+            var portBWType = portBinding + '/tcp';      
+        }
         for (var i=0; i<dJson.cardinality[comp]; i++)
         {
             // TODO: Try to delete stdout. Now stdout is merging the stdout
             // of each container. 
+        var drunArgs ={};
+        drunArgs['Hostname']=comp+'-'+i+'-'+id;
+        drunArgs['name']=comp+'-'+i+'-'+id;
+        drunArgs['Cmd']=['node','runtime.js',cArgs];
+        drunArgs['ExposedPorts']={};
+        if(comp==sJson.entrypoint.comp)
+            drunArgs['ExposedPorts'][portBWType]={}
+        drunArgs['HostConfig']={};
+        drunArgs['HostConfig']['NetworkMode']='deployernet'+'-'+id;
+        if(comp==sJson.entrypoint.comp){
+            drunArgs['HostConfig']['PortBindings']={};
+            drunArgs['HostConfig']['PortBindings'][portBWType]=[{"HostPort":portToMap }];
+        }       
             
-            docker.run('component/'+comp,[],process.stdout,{
-                'Hostname':comp+'-'+i+'-'+id,
-                'name':comp+'-'+i+'-'+id,
-                'Cmd':['node','runtime.js',cArgs],
-                'ExposedPorts': { 
-                    //'5000/tcp': {} 
-                    },
-                'HostConfig':{
-                    'NetworkMode':'deployernet'+'-'+id,
-                    'PortBindings':{
-                        portBWType:[{"HostPort":portBinding }]
-                    }
-                    }
-                },
+            docker.run('component/'+comp,[],process.stdout,drunArgs,
             function(err){
                     if(err) console.log(err)
                     else console.log('Container: '+comp+'-'+i+' ... is Running \n')
             })
         }
-    }
-    else
-    {
-        for (var i=0; i<dJson.cardinality[comp]; i++)
-        {
-            // TODO: Try to delete stdout. Now stdout is merging the stdout
-            // of each container. 
-            
-            docker.run('component/'+comp,[],process.stdout,{
-                'Hostname':comp+'-'+i+'-'+id,
-                'name':comp+'-'+i+'-'+id,
-                'Cmd':['node','runtime.js',cArgs],
-                'ExposedPorts': { 
-                    //'5000/tcp': {} 
-                    },
-                'HostConfig':{
-                    'NetworkMode':'deployernet'+'-'+id
-                }
-                },
-            function(err){
-                    if(err) console.log(err)
-                    else console.log('Container: '+comp+'-'+i+' ... is Running \n')
-            })
-        }
-    }
 })
     

@@ -9,6 +9,7 @@
         "chan1":
         {
             "type":"lb",
+            "sub-type":"round-robin",
             "source":{
                 "comp":"comp1",
                 "endpoint":"o1"

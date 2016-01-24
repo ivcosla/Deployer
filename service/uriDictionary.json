@@ -1,4 +1,4 @@
 {
-    "http://deployer/service/comp":"/home/ivan/Escritorio/deployer/prueba/component.tgz",
-    "http://deployer/service/comp2":"/home/ivan/Escritorio/deployer/prueba/component2.tgz"
+    "http://deployer/service/comp":"/vagrant/prueba/component.tgz",
+    "http://deployer/service/comp2":"/vagrant/prueba/component2.tgz"
 }
