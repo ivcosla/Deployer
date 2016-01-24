@@ -7,7 +7,8 @@ var cJson = require('../package.json')
 var zmq = require('zmq')
 // Gets the names of the components that this component
 // has an output connection with througth arguments
-var args = process.argv.slice(2)
+var args = process.argv.slice(2)[0]
+args = args.split(' ')
 console.log(args)
 
 // Endpoint object and methods. It can bind and connect accepting a callback,
@@ -43,7 +44,7 @@ var inConns = cJson.connections['input-connection'];
 
 var index = 0;
 for (var endPName in inConns){
-    endpoints[endPName] = new Endpoint('localhost',args[index++],inConns[endPName]);
+    endpoints[endPName] = new Endpoint('*',args[index++],inConns[endPName]);
 }
 
 // Loops througth output-connection

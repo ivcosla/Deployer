@@ -5,19 +5,17 @@ var component = JSON.parse(pack_json);
 
 setTimeout(function(){
     //var serviceEndPoint = process.argv[1]
-    var push = zmq.socket('push');
-    var pull = zmq.socket('pull');
 
-    push.connect('tcp://comp1-0:8000',function(err){
+    endpoints.o1.connect(function(err){
         if(err) console.log(err)
     });
     setInterval(function(){
-        push.send('hola')
+        endpoints.o1.socket.send('hola')
     },10000);
 
-    pull.bind('tcp://*:8000',function(err){
+    endpoints.i1.bind(function(err){
         if(err) console.log(err)
-        pull.on('message',function(msg){
+        endpoints.i1.socket.on('message',function(msg){
             console.log(msg.toString())
         })
     })

@@ -39,30 +39,36 @@ module.exports=function(){
     }
 
     // Finally this function creates the Dockerfile given
-    // the path to the component. Example of the directory
-    // with a component that only has one .js as code.
-    // Input directory:
-    /*  component
-        ├── code
-        └── package.json
-    */
-    // Output directory:
-    /*  component
+    // the path to the component. Also copies the runtime to
+    // the component path.
+    // Example input directory:
+/*    component
         ├── code
         │   └── component.js
-        ├── Dockerfile
         └── package.json
-    */
+       
+       Example output directory:
+        component
+        ├── code
+        │   ├── component.js
+        │   └── runtime.js
+        ├── Dockerfile
+        └── package.json       
+        
+ */
+
 
     this.composeDockerfile = function (pathToComponent, serv){
-        var comp = this.getJson(pathToComponent+'package.json');
+        //var comp = this.getJson(pathToComponent+'package.json');
         //var serv = this.getJson(pathToService+'package.json');
         var res = 'FROM component/base\nRUN mkdir component\n'+
                 'COPY . /component/ \n'+'WORKDIR "/component/code"\n'
                 
         res=res+this.writeDependencies(serv);
 
-        res=res+ 'CMD ["nodejs","component.js"]'
+        //res=res+ 'CMD ["nodejs","component.js"]'
         fs.writeFileSync(pathToComponent+'Dockerfile',res);
+        var runtimef = fs.readFileSync('./runtime/runtime.js');
+        fs.writeFileSync(pathToComponent+'/code/runtime.js',runtimef);
     }
 }

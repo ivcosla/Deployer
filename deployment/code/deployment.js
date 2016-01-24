@@ -77,21 +77,24 @@ var inSockts = sockts[0]; var outSockts = sockts[1];
 // First we deploy possible channels (check if there is at least one lb channel)
 if (Object.keys(inSockts['lb']).length>0)
 {
-    var chIndex=0;
+    //var chIndex=0;
     for (var channel in inSockts['lb'])
     {
         var chArgs = argumentsParser.convertToChannelArguments(inSockts['lb'][channel],
         outSockts['lb'][channel]);
         
         docker.run('channel/lb',[],process.stdout,{
-            'Hostname':channel+'-'+chIndex++,
-            'name':comp+'-'+i,
+            'Hostname':channel,
+            'name':channel,
+            'Cmd':['node', 'router.js', chArgs] ,
             'ExposedPorts': { 
-                '8000/tcp': {} 
+                '5000/tcp': {} 
                 },
              'HostConfig':{
                  'NetworkMode':'deployernet'
              }
+            },function(err){
+                if(err) console.log(err);
             });       
     }
 }
@@ -99,6 +102,8 @@ if (Object.keys(inSockts['lb']).length>0)
 
 // Deploy each container when its image is builded
 myEmitter.on('buildFinish', function(comp){
+    var cArgs = argumentsParser.convertToComponentArguments(inSockts[comp],
+        outSockts[comp]);
     for (var i=0; i<dJson.cardinality[comp]; i++)
     {
         // TODO: Try to delete stdout. Now stdout is merging the stdout
@@ -107,8 +112,9 @@ myEmitter.on('buildFinish', function(comp){
         docker.run('component/'+comp,[],process.stdout,{
             'Hostname':comp+'-'+i,
             'name':comp+'-'+i,
+            'Cmd':['node','runtime.js',cArgs],
             'ExposedPorts': { 
-                '8000/tcp': {} 
+                '5000/tcp': {} 
                 },
              'HostConfig':{
                  'NetworkMode':'deployernet'
