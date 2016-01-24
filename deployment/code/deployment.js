@@ -21,7 +21,13 @@ var Dfm = require("./dockerFileMaker.js");
 var dfm = new Dfm();
 
 // For solving uri, retrieving .tgz and updating cache
-var uriSolver = require("./uriSolver.js")
+var uriSolver = require("./uriSolver.js");
+
+// For assign ports and address to each endpoint acording to the graph
+var graphParser = require("./graphParser.js");
+
+// For convert the graphParser dictionaries into arguments for containers
+var argumentsParser = require("./argumentsParser.js");
 
 var paths = uriSolver.solve(dJson);
 console.log(paths)
@@ -61,7 +67,35 @@ for (var comp in components){
                 }
             })
     })(comp);
-}    
+}
+// TODO: pass arguments on docker.run. Create image for lb channel. Unequivoque names for
+// every service network and container.
+   
+var sockts = graphParser.parse(dJson,sJson,paths)
+var inSockts = sockts[0]; var outSockts = sockts[1];
+
+// First we deploy possible channels (check if there is at least one lb channel)
+if (Object.keys(inSockts['lb']).length>0)
+{
+    var chIndex=0;
+    for (var channel in inSockts['lb'])
+    {
+        var chArgs = argumentsParser.convertToChannelArguments(inSockts['lb'][channel],
+        outSockts['lb'][channel]);
+        
+        docker.run('channel/lb',[],process.stdout,{
+            'Hostname':channel+'-'+chIndex++,
+            'name':comp+'-'+i,
+            'ExposedPorts': { 
+                '8000/tcp': {} 
+                },
+             'HostConfig':{
+                 'NetworkMode':'deployernet'
+             }
+            });       
+    }
+}
+// Same with component arguments
 
 // Deploy each container when its image is builded
 myEmitter.on('buildFinish', function(comp){

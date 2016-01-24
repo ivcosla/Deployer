@@ -50,9 +50,11 @@ function parse(dJson,sJson,paths){
         var cse = graph[channel].source.endpoint;
         var csc = graph[channel].source.comp;
         
+        // Each entry: { dest_host: { source_ep:port }}
         if(graph[channel].type=="point-to-point"){
 
-            outSocketList[csc][cse] = inSocketList[cdc][cde];  
+            outSocketList[csc][cdc+'-0']={};
+            outSocketList[csc][cdc+'-0'][cse] = inSocketList[cdc][cde];  
         }     
     
         if(graph[channel].type=="lb"){
@@ -60,7 +62,8 @@ function parse(dJson,sJson,paths){
             // channel.
             inSocketList['lb'][channel] = inSocketList[cdc][cde];
             outSocketList['lb'][channel] = {};
-
+            outSocketList[csc][channel]={};
+            outSocketList[csc][channel][cse] = inSocketList[cdc][cde];
             
             var lbTargetCardinality = dJson.cardinality[cdc];
             for (var i = 0; i < lbTargetCardinality; i++ ){
