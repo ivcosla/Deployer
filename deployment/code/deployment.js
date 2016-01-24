@@ -97,7 +97,7 @@ if (Object.keys(inSockts['lb']).length>0)
             'name':channel,
             'Cmd':['node', 'router.js', chArgs] ,
             'ExposedPorts': { 
-                '5000/tcp': {} 
+                //'5000/tcp': {} 
                 },
              'HostConfig':{
                  'NetworkMode':'deployernet'+'-'+id
@@ -113,26 +113,59 @@ if (Object.keys(inSockts['lb']).length>0)
 myEmitter.on('buildFinish', function(comp){
     var cArgs = argumentsParser.convertToComponentArguments(inSockts[comp],
         outSockts[comp]);
-    for (var i=0; i<dJson.cardinality[comp]; i++)
-    {
-        // TODO: Try to delete stdout. Now stdout is merging the stdout
-        // of each container. 
-        
-        docker.run('component/'+comp,[],process.stdout,{
-            'Hostname':comp+'-'+i+'-'+id,
-            'name':comp+'-'+i+'-'+id,
-            'Cmd':['node','runtime.js',cArgs],
-            'ExposedPorts': { 
-                '5000/tcp': {} 
+    if(comp==sJson.entrypoint.comp)
+    {   
+        var portBinding = inSockts[sJson.entrypoint.comp][sJson.entrypoint.endpoint];
+        portBinding=portBinding.toString();
+        var portBWType = portBinding + '/tcp'; 
+        for (var i=0; i<dJson.cardinality[comp]; i++)
+        {
+            // TODO: Try to delete stdout. Now stdout is merging the stdout
+            // of each container. 
+            
+            docker.run('component/'+comp,[],process.stdout,{
+                'Hostname':comp+'-'+i+'-'+id,
+                'name':comp+'-'+i+'-'+id,
+                'Cmd':['node','runtime.js',cArgs],
+                'ExposedPorts': { 
+                    //'5000/tcp': {} 
+                    },
+                'HostConfig':{
+                    'NetworkMode':'deployernet'+'-'+id,
+                    'PortBindings':{
+                        portBWType:[{"HostPort":portBinding }]
+                    }
+                    }
                 },
-             'HostConfig':{
-                 'NetworkMode':'deployernet'+'-'+id
-             }
-            },
-        function(err){
-                if(err) console.log(err)
-                else console.log('Container: '+comp+'-'+i+' ... is Running \n')
-        })
+            function(err){
+                    if(err) console.log(err)
+                    else console.log('Container: '+comp+'-'+i+' ... is Running \n')
+            })
+        }
+    }
+    else
+    {
+        for (var i=0; i<dJson.cardinality[comp]; i++)
+        {
+            // TODO: Try to delete stdout. Now stdout is merging the stdout
+            // of each container. 
+            
+            docker.run('component/'+comp,[],process.stdout,{
+                'Hostname':comp+'-'+i+'-'+id,
+                'name':comp+'-'+i+'-'+id,
+                'Cmd':['node','runtime.js',cArgs],
+                'ExposedPorts': { 
+                    //'5000/tcp': {} 
+                    },
+                'HostConfig':{
+                    'NetworkMode':'deployernet'+'-'+id
+                }
+                },
+            function(err){
+                    if(err) console.log(err)
+                    else console.log('Container: '+comp+'-'+i+' ... is Running \n')
+            })
+        }
     }
 })
     
