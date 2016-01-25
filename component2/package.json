@@ -1,5 +1,4 @@
 {
-	"ID":"comp://deployer/component2",	
 	"connections":{
 		"input-connection":{
 			"i1":"pull",
@@ -9,7 +8,6 @@
 			"o1":"push"
 		}
 	},
-	"entrypoint":"code/component2.js",
 	"params":{
 		"param1":"1",
 		"param2":"null"
