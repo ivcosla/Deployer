@@ -6,8 +6,8 @@
 * [tar.gz](https://www.npmjs.com/package/tar.gz)
 
 #### Imágenes
-* component/base -> construida con el Dockerfile del directorio raíz.
-* channel/lb -> construida con el Dockerfile del directorio deployment/router/
+* **component/base** -> construida con el Dockerfile del directorio raíz.
+* **channel/lb** -> construida con el Dockerfile del directorio deployment/router/
 
 ### Uso
 
@@ -18,22 +18,35 @@ todos ellos deben de tener un archivo "package.json" en su raíz.
 Debe de haber en el directorio deployment un uriDictionary.json que contenga las reglas para, a partir del
 uri del servicio (especificado en el package.json de deployment) localizar el servicio, comprimido en tgz.
 
+**IMPORTANTE** los .tgz deben de comprimirse sin su directorio padre. Por ejemplo, situándonos en el directorio de un componente:
+`tar -cvfz ../componente.tgz *`
 
 A su vez debe de haber otro uriDictionary.json en el directorio del servicio (que se encuentra comprimido), con las reglas para,
 a partir del uri de cada componente (especificados en el package.json del servicio) localizar cada componente, también comprimido en tgz.
 En esta versión del deployer sólo se admite que los tgz estén en rutas locales, en versiones futuras se permitirá obtenerlos de recursos remotos.
 
 Los tgz encontrados mediante la resolución de uris se traen a una "caché" (deployment/cache/) local para evitar tener que traerlos de nuevo
-en otras instancias de servicios. Esta funcionalidad tendrá mayor sentido cuando se permita obtener los tgz de recursos remotos.
+en otras instancias de servicios. Esta funcionalidad tendrá mayor sentido cuando se permita obtener los tgz de recursos remotos. A tener en cuenta
+que se considera códigos diferentes uris diferentes, aunque el .tgz al que hacen referencia se llame igual. Para ello el deployer.js construye una
+jerarquía de directorios partiendo del uri, en el se almacena el .tgz, de manera que puedan coexistir .tgz de mismo nombre y distinta procedencia.
 
 En el directorio del proyecto hay ejemplos de directorio de servicio y de componentes.
 
 
 
-* ##### Requisito para directorios de componentes
-Deben de contener los ejecutables en una subcarpeta llamada "code", y el programa principal debe de llamarse "componente.js", ya que será
+*  __Requisito para directorios de componentes__
+
+Deben de contener los scripts en una subcarpeta llamada "code", y el programa principal debe de llamarse "componente.js", ya que será
 invocado por un runtime.
 
+Un ejemplo de directorio de componente válido, antes de ser comprimido para su uso en el deployer:
+
+```bash
+    component/
+    ├── code
+    │   └── component.js
+    └── package.json
+```
 
 
 * ##### Espacio de trabajo empleado por el Deployer
@@ -94,6 +107,28 @@ atributo "socket" del endpoint. Un ejemplo de uso:
         })
     });
 ```
+
+#### Líneas de trabajo futuras
+
+- [ ] Añadir canales pub/sub: Canal uno a muchos, lo implementaría como un router ejecutándose en su propio contenedor,
+debería propagar el "tag" del publisher a los subscribers, de manera que sólo atiendan aquellos mensajes con un tag al que están
+suscritos.
+
+- [ ] Añadir canales no anónimos: Podría implementarse con sockets de tipo router en los canales en lugar de push/pull.
+
+- [ ] Mayor facilidad de despliegue: Recibir el package.json que ahora está en el directorio deployment como un argumento más, de manera
+que cada vez que se ejecuta `node deployer.js` puedan lanzarse servicios diferentes
+(por que la cardinalidad y uri del servicio se encuentran en ese .json)
+
+- [ ] Monitorización de los contenedores: En primer lugar mantener un canal de comunicación abierto entre el deployer.js (u otro script) y
+el runtime.js de cada contenedor.
+Mediante eventos periódicos lanzados desde el runtime de cada contenedores se puede saber si dicho contenedor ha quedado bloqueado,
+entonces se podrá comunicar con deployer.js y que este lance una nueva instancia a ejecución.
+Deployer.js comunicará a través del canal con el runtime.js las nuevas direcciones y puertos de las nuevas instancias, así como aquellas 
+que han quedado bloqueadas y con las que los otros contenedores ya no deberían comunicar.
+Una posibilidad sería lanzar deployer.js en un contenedor, montando en dicho contenedor el socket de docker. Puede hacer con la siguiente
+opción en un docker run: `-v /var/run/docker.sock:/var/run/docker.sock`. De esta forma es posible tanto crear como parar contenedores desde
+dentro de la red privada de estos contenedores, sin necesidad de publicar más puertos.
 
 #### JSON
 
