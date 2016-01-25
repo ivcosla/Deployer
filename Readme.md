@@ -105,5 +105,50 @@ La función y posibles valores de los distintos atributos especificados en los p
     las uris de dichos componentes. El nombre se empleará para nominar las distintas instancias de los contenedores de dichos componentes.
     La uri se empleará para localizar el .tgz de dicho componente.
     
-    * **graph:**
+    * **graph:** El grafo contiene la descripción de los distintos canales de comunicación entre los componentes, será un diccionario cuyas
+    claves serán los nombres del canal y los valores serán a su vez diccionarios describiendo el canal. Los valores que describen el canal son:
     
+        * **type:** El tipo del canal, actualmente se soportan dos tipos:
+        
+            1. "point-to-point". Canal direccionado del componente A al componente B. A y B pueden tener cualquier cardinalidad, pero todas
+            las instancias de A se conectarán únicamente a la primera instancia de B.
+            
+            2. "lb". Canal direccionado de balanceo de carga (de A a B, ambas con cualquier cardinalidad), este tipo de 
+            canales se han implementado como contenedores a parte, que redirigirán el tráfico de todas las instancias de A
+            a una instancia de B escogida dependiendo del parámetro "sub-type".
+            
+        * **sub-type:** Sólo disponible para canales tipo lb, puede tomar los valores "rand" o "round-robin". En el primer caso
+        el destino se escogerá de manera aleatoria cada vez, en el segundo caso se escogerá cada vez una instancia de B de manera
+        consecutiva y circular.
+        
+        * **source:** Un diccionario que describe el tipo de componente que actuará como fuente de este canal, sus posibles valores
+        se detallan a continuación:
+            
+            * **comp:** Tipo del componente del que parte el canal.
+            
+            * **endpoint:** Endpoint del componente desde donde se enviarán datos por el canal.
+            
+        * **destination:** Un diccionario que describe el tipo de componente que actuará como destino de este canal, sus posibles valores
+        se detallan a continuación:
+        
+            * **comp:** Tipo del componente destino del canal.
+            
+            * **endpoint:** Endpoint del componente que escucha en el canal.
+            
+    * **entrypoint:** Diccionario que contiene los datos del componente y endpoint que serán el entrypoint del servicio. El puerto de dicho
+    entrypoint se mapeará al puerto del host recibido como segundo argumento por el deployment.
+    
+        * **comp:** Componente donde se encuentra el entrypoint.
+        * **endpoint:** Endpoint que escucha las posibles comunicaciones recibidas desde el puerto mapeado en el host.
+        
+    * **params:** Ídem que params en el package.json de deployment.
+    
+    * **dependencies:** Diccionario que contendrá como claves el nombre simbólico de las dependencias a instalar y como valor
+    la dependencia a instalar. Deployer.js creará un Dockerfile para cada componente, en él se incluirá la instalación de estas
+    dependencias. Los posibles valores se detallan a continuación.
+    
+        1. "system:nombre_paquete" se instalará el paquete empleando el comando apt-get install -y nombre_paquete
+        2. "node:nombre_paquete" se instalará el paquete empleando el comando npm install nombre_paquete
+        
+* ##### package.json del directorio de cada componente
+        
