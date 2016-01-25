@@ -1,5 +1,4 @@
-{
-	"ID":"../component.tgz",	
+{	
 	"connections":{
 		"input-connection":{
 			"i1":"pull",
@@ -9,7 +8,6 @@
 			"o1":"push"
         }
 	},
-	"entrypoint":"code/component.js",
 	"params":{
 		"param1":"1",
 		"param2":"null"
