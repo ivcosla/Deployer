@@ -28,10 +28,37 @@ en otras instancias de servicios. Esta funcionalidad tendrá mayor sentido cuand
 
 En el directorio del proyecto hay ejemplos de directorio de servicio y de componentes.
 
-##### Requisito para directorios de componentes
+
+
+* ##### Requisito para directorios de componentes
 Deben de contener los ejecutables en una subcarpeta llamada "code", y el programa principal debe de llamarse "componente.js", ya que será
 invocado por un runtime.
 
+
+
+* ##### Espacio de trabajo empleado por el Deployer
+El deployer descomprimirá los tgz en el directorio raíz del proyecto. Por ejemplo:
+    ```
+    Directorio del proyecto al inicio, alojando los .tgz en el:
+    proyecto/
+    ├── component.tgz
+    ├── component2.tgz
+    ├── deployment
+    └── service.tgz
+    
+    Directorio del proyecto tras ejecutar deployment/code/deployer.js:
+    proyecto/
+    ├── comp1
+    ├── comp2
+    ├── component.tgz
+    ├── component2.tgz
+    ├── deployment
+    ├── service
+    └── service.tgz
+    
+    ```
+    
+    
 #### Argumentos
 El programa principal del Deployer es deployment/code/deployer.js.
 
@@ -53,3 +80,30 @@ que componentes forman parte de que servicio lanzado.
 #### JSON
 
 La función y posibles valores de los distintos atributos especificados en los package.json:
+
+* ##### package.json del directorio deployment
+
+    * **url:** La url del despliegue, hace referencia a la localización del servicio. A partir de él se forman las
+    uris del servicio y los componentes.
+    
+    * **servicio:** uri del servicio. Mediante el uriDictionary.json proporcionado por el cliente se obtendrá la localización del service.tgz.
+    En versiones futuras se pretende distinguir si es un recurso remoto en base a la cabecera (https:// o file://), ahora el desplegador
+    omitirá la cabecera
+    
+    * **cardinality:** Diccionario cuyas claves serán el tipo de componente y valor número de instancias de dicho componente
+    
+    * **params:** En la versión actual no se ha implementado el manejo de parámetros del despliegue, servicio y componentes. En versiones
+    futuras se pretende que los parámetros del despliegue indiquen parámetros a pasar como argumentos al desplegar cada servicio, en los del servicio
+    los que se pasarán como argumentos al desplegar cada componente, y en los del componente los que se pasarán a dicho tipo de componente.
+    Tomarán preferencia en orden inverso (componente, servicio y despliegue) pudiendo sobreescribirse parámetros.
+    
+* ##### package.json del directorio service
+
+    * **uri:** Uri del servicio, en la versión actual no se emplea por estar también en el package.json del deployer.
+    
+    * **components:** Diccionario clave-valor cuyas claves serán nombres de los tipos de componente del servicio y cuyo valor serán
+    las uris de dichos componentes. El nombre se empleará para nominar las distintas instancias de los contenedores de dichos componentes.
+    La uri se empleará para localizar el .tgz de dicho componente.
+    
+    * **graph:**
+    
