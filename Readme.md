@@ -77,6 +77,24 @@ que componentes forman parte de que servicio lanzado.
 
 * Argumento 2: Puerto para mapear el entrypoint del servicio con un puerto del host. Diferentes puertos evitarán colisión de puertos.
 
+#### Código del cliente
+El código de los componentes tendrá disponible para su uso el acceso a una variable global llamada "endpoints". Esta 
+variable contiene los endpoints del componente como atributos, estos endpoints están configurados con su tipo de socket, host y puerto.
+
+El cliente podrá hacer las operaciones `bind()` y `connect()` sin necesidad de saber a que puerto o host conectarse, puede pasar un callback
+como argumento. Para el resto de operaciones que permite zmq (tales como `.on(event)` o `.send(msg)`) deberá acceder al 
+atributo "socket" del endpoint. Un ejemplo de uso:
+
+```javascript
+    endpoints.i1.bind(function(err){
+        if(err) console.log(err);
+        console.log('conectado')
+        endpoints.i1.socket.on("message", function(msg){
+            console.log(msg.toString());
+        })
+    });
+```
+
 #### JSON
 
 La función y posibles valores de los distintos atributos especificados en los package.json:
@@ -151,4 +169,10 @@ La función y posibles valores de los distintos atributos especificados en los p
         2. "node:nombre_paquete" se instalará el paquete empleando el comando npm install nombre_paquete
         
 * ##### package.json del directorio de cada componente
+
+    * **Connections:** Diccionario que describe los endpoints de entrada y los de salida:
         
+        * **input-connection:** Diccionario que tiene como claves los nombres de los endpoints de entrada y como valor el tipo de socket zmq que son.
+        * **output-connection:** Diccionario que tiene como claves los nombres de los endpoints de salida y como valor el tipo de socket zmq que son.
+        
+    * **Params:** Ídem que params de los package.json de deployment y service
